@@ -48,6 +48,26 @@ class StackingClassifier(BaseEstimator, ClassifierMixin, TransformerMixin):
             raise TypeError(
                 f"Meta classifier {self.meta_classifier} is not a classifier.")
 
+    def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep: boolean, optional
+            If True, will return the parameters for this estimator and
+            contained subobjects that are estimators.
+
+        Returns
+        -------
+        params: mapping of string to any
+            Parameter names mapped to their values.
+        """
+
+        if not deep:
+            return super(StackingClassifier, self).get_params(deep=False)
+        else:
+            pass
+
     def fit(self, X, y):
         """Fit the meta classifier to the base classifiers.
 
