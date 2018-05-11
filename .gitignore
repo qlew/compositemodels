@@ -1,4 +1,5 @@
 **/doc/build/*.*
 **/__pycache__/*.*
 **/doc/Makefile
-**/doc/*.*
+**/doc/build/**/*.*
+**/doc/build/**
