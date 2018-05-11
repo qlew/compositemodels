@@ -19,6 +19,15 @@ class StackingClassifier(BaseEstimator, ClassifierMixin, TransformerMixin):
         The second-level classifier to be fitted to the predictions of the
         base classifiers.
 
+    probas: boolean, optional (default True)
+        If True the class probabilities as returned from `predict_proba`
+        of the base classifiers will be used as meta features for training
+        of the meta classifier. Otherwise the predicted classes as returned
+        from `predict` of the base classifiers will be used.
+
+    use_orig_features: boolean, optional (default False)
+        If True the orginal features X along with prediction from the base
+        classifiers will be used as features for training the meta classifier.
 
     """
 
@@ -51,16 +60,6 @@ class StackingClassifier(BaseEstimator, ClassifierMixin, TransformerMixin):
         y: array-like, shape(n_samples,)
             Labels for classification.
 
-        probas: boolean, optional (default True)
-            If True the class probabilities as returned from `predict_proba`
-            of the base classifiers will be used as meta features for training
-            of the meta classifier. Otherwise the predicted classes as returned
-            from `predict` of the base classifiers will be used.
-
-        use_orig_features: boolean, optional (default False)
-            If True the orginal features X along with the meta features will be
-            used as features for training the meta classifier.
-
         Returns
         -------
         self: object
@@ -69,15 +68,9 @@ class StackingClassifier(BaseEstimator, ClassifierMixin, TransformerMixin):
 
         for clf in self.base_classifiers:
             clf.fit(X, y)
-
         X_meta = self._get_meta_features(X)
 
-        if not self.use_orig_features:
-            self.meta_classifier.fit(X_meta, y)
-        else:
-            self.meta_classifier.fit(np.hstack((X, X_meta)), y)
-
-        return self
+        return self.meta_classifier.fit(X_meta, y)
 
     def _get_meta_features(self, X):
         if self.probas:
