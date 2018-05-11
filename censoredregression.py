@@ -1,5 +1,4 @@
-"""Regression model for censored data.
-"""
+"""Regression model for censored data."""
 from sklearn.base import BaseEstimator
 from sklearn.base import RegressorMixin
 from sklearn.base import TransformerMixin
