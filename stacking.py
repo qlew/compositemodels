@@ -1,4 +1,4 @@
-"""Simple models to stack estimators"""
+"""Simple model to stack classifiers."""
 
 from sklearn.base import BaseEstimator
 from sklearn.base import ClassifierMixin
@@ -8,7 +8,7 @@ import numpy as np
 
 
 class StackingClassifier(BaseEstimator, ClassifierMixin, TransformerMixin):
-    """Simple stacking classifier
+    """Simple stacking classifier.
 
     Parameters
     ----------
@@ -33,6 +33,7 @@ class StackingClassifier(BaseEstimator, ClassifierMixin, TransformerMixin):
 
     def __init__(self, base_classifiers, meta_classifier, probas=True,
                  use_orig_features=False):
+        """Constructor."""
         self.base_classifiers = base_classifiers
         self.meta_classifier = meta_classifier
         self._check_classifiers()
@@ -61,8 +62,8 @@ class StackingClassifier(BaseEstimator, ClassifierMixin, TransformerMixin):
         -------
         params: mapping of string to any
             Parameter names mapped to their values.
-        """
 
+        """
         if not deep:
             return super(StackingClassifier, self).get_params(deep=False)
         else:
@@ -84,8 +85,8 @@ class StackingClassifier(BaseEstimator, ClassifierMixin, TransformerMixin):
         -------
         self: object
             Returns self
-        """
 
+        """
         for clf in self.base_classifiers:
             clf.fit(X, y)
         X_meta = self._get_meta_features(X)
@@ -118,6 +119,7 @@ class StackingClassifier(BaseEstimator, ClassifierMixin, TransformerMixin):
         -------
         y: array of shape n_samples
             Predicted class labels.
+
         """
         X_meta = self._get_meta_features(X)
         return self.meta_classifier.predict(X_meta)
@@ -135,7 +137,7 @@ class StackingClassifier(BaseEstimator, ClassifierMixin, TransformerMixin):
         -------
         y: array of shape n_samples
             Predicted class probabilities.
-        """
 
+        """
         X_meta = self._get_meta_features(X)
         return self.meta_classifier.predict_proba(X_meta)

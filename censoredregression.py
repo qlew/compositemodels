@@ -35,11 +35,12 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
         Dictionary with names for the estimators (classifier and regressor)
         as keys and the corresponding instances of classifier and regressor
         as values.
+
     """
 
     def __init__(self, classifier, regressor, censored_value=0.0,
                  censored_how='left'):
-
+        """Constructor."""
         self._check_estimators(classifier, regressor)
         self.classifier = classifier
         self.regressor = regressor
@@ -68,6 +69,7 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
         -------
         params: mapping of string to any
             Parameter names mapped to their values.
+
         """
         if not deep:
             return super(CensoredRegression, self).get_params(deep=False)
@@ -157,6 +159,7 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
         -------
         y: array of shape n_samples
             Predicted regression values.
+
         """
         return self._predict(X)
 
@@ -176,6 +179,7 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
         -------
         self: object
             Returns self.
+
         """
         self._fit_clf(X, y)
         self._fit_regr(X, y)
