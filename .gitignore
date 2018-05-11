@@ -1,3 +1,4 @@
-models/doc/build/*.*
-models/__pycache__/*.*
-models/doc/Makefile
+**/doc/build/*.*
+**/__pycache__/*.*
+**/doc/Makefile
+**/doc/*.*
