@@ -16,12 +16,15 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
     Parameters
     ----------
     classifier: object
-        Instance of a classifier. Expected to be an instance of
-        sklearn.base.BaseEstimator and sklearn.base.ClassifierMixin.
+        Classifier that will be fitted to the derived class labels; where the
+        positive class indicates that the regression target has been observed.
+        Expected to be an instance of `sklearn.base.BaseEstimator` and
+        `sklearn.base.ClassifierMixin`.
 
     regressor: object
-        Instance of a regressor. Expected to be an instance of
-        sklearn.base.BaseEstimator and sklearn.base.RegressorMixin.
+        Regressor that will be trained on the samples of the positive class.
+        Expected to be an instance of `sklearn.base.BaseEstimator` and
+        `sklearn.base.RegressorMixin`.
 
     censored_value: float (default: 0.0)
         Threshold below or above which target is not observed.
@@ -135,19 +138,19 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
 
         return y_labels
 
-    def _fit_clf(self, X, y):
-        y_labels = self._get_classification_labels(y_cont=y)
-        self.classifier.fit(X, y_labels)
+    # def _fit_clf(self, X, y):
+    #     y_labels = self._get_classification_labels(y_cont=y)
+    #     self.classifier.fit(X, y_labels)
+    #
+    # def _fit_regr(self, X, y):
+    #     X_r, y_r = self._get_regression_data(X, y)
+    #     self.regressor.fit(X_r, y_r)
 
-    def _fit_regr(self, X, y):
-        X_r, y_r = self._get_regression_data(X, y)
-        self.regressor.fit(X_r, y_r)
-
-    def _predict(self, X):
-        y_pred_prob = self.classifier.predict_proba(X)
-        y_pred_regr = self.regressor.predict(X)
-
-        return y_pred_prob[:, 1] * y_pred_regr
+    # def _predict(self, X):
+    #     y_pred_prob = self.classifier.predict_proba(X)
+    #     y_pred_regr = self.regressor.predict(X)
+    #
+    #     return y_pred_prob[:, 1] * y_pred_regr
 
     def predict(self, X):
         """Predict censored regression value for X.
@@ -164,7 +167,10 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
             Predicted regression values.
 
         """
-        return self._predict(X)
+        y_pred_prob = self.classifier.predict_proba(X)
+        y_pred_regr = self.regressor.predict(X)
+
+        return np.multiply(y_pred_prob, y_pred_regr)
 
     def fit(self, X, y):
         """Fit the censored regression model to the given training data.
@@ -184,6 +190,10 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
             Returns self.
 
         """
-        self._fit_clf(X, y)
-        self._fit_regr(X, y)
+        y_labels = self._get_classification_labels(y_cont=y)
+        self.classifier.fit(X, y_labels)
+
+        X_r, y_r = self._get_regression_data(X, y)
+        self.regressor.git(X_r, y_r)
+
         return self
