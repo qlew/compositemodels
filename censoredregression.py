@@ -41,7 +41,10 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
 
     def __init__(self, classifier, regressor, censored_value=0.0,
                  censored_how='left'):
-        """Constructor."""
+        """Initialise CensoredRegression with classifier, regressor.
+
+        Optional parameters censored_value, censored_how can be set as well.
+        """
         self._check_estimators(classifier, regressor)
         self.classifier = classifier
         self.regressor = regressor

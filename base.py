@@ -17,7 +17,7 @@ class BaseStacking(ABC, BaseEstimator):
     @abstractmethod
     def __init__(self, base_estimators, meta_estimator,
                  use_orig_features=False):
-        """Abstract constructor for stacking models."""
+        """Initialise BaseStacking with base and meta estimators."""
         self.base_estimators = base_estimators
         self.meta_estimator = meta_estimator
         # self.named_base_estimators = self._get_named_estimators(
@@ -133,7 +133,7 @@ class StackingClassifier(BaseStacking, ClassifierMixin):
 
     def __init__(self, base_classifiers, meta_classifier,
                  use_orig_features=False, probas=True):
-        """Constructor."""
+        """Initialise StackingClassifier with base and meta classifiers."""
         super(StackingClassifier, self).__init__(
             base_estimators=base_classifiers,
             meta_estimator=meta_classifier,
@@ -185,12 +185,6 @@ class StackingRegressor(BaseStacking, RegressorMixin):
         The second-level classifier to be fitted to the predictions of the
         base classifiers.
 
-    probas: boolean, optional (default True)
-        If True the class probabilities as returned from `predict_proba`
-        of the base classifiers will be used as meta features for training
-        of the meta classifier. Otherwise the predicted classes as returned
-        from `predict` of the base classifiers will be used.
-
     use_orig_features: boolean, optional (default False)
         If True the orginal features X along with prediction from the base
         classifiers will be used as features for training the meta classifier.
@@ -199,7 +193,7 @@ class StackingRegressor(BaseStacking, RegressorMixin):
 
     def __init__(self, base_regressors, meta_regressor,
                  use_orig_features=False):
-        """Constructor."""
+        """Initialise StackingRegressor with base and meta regressors."""
         super(StackingRegressor, self).__init__(
             base_estimators=base_regressors,
             meta_estimator=meta_regressor,
