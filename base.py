@@ -176,18 +176,18 @@ class StackingRegressor(BaseStacking, RegressorMixin):
 
     Parameters
     ----------
-    base_classifiers: array-like of shape n_classifiers
-        A list of base classifiers. They are expected to be instances of
+    base_regressors: array-like of shape n_classifiers
+        A list of base regressors. They are expected to be instances of
         `sklearn.base.BaseEstimator` and `sklearn.base.RegressorMixin`.
 
-    meta_classifier: object
-        The second-level classifier to be fitted to the predictions of the
-        base classifiers. They are expected to be instances of
+    meta_regressor: object
+        The second-level regressor to be fitted to the predictions of the
+        base regressors. They are expected to be instances of
         `sklearn.base.BaseEstimator` and `sklearn.base.RegressorMixin`.
 
     use_orig_features: boolean, optional (default False)
         If True the orginal features X along with prediction from the base
-        classifiers will be used as features for training the meta classifier.
+        regressors will be used as features for training the meta regressor.
 
     """
 
