@@ -194,6 +194,6 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
         self.classifier.fit(X, y_labels)
 
         X_r, y_r = self._get_regression_data(X, y)
-        self.regressor.git(X_r, y_r)
+        self.regressor.fit(X_r, y_r)
 
         return self
