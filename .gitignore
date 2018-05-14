@@ -3,3 +3,4 @@
 **/doc/Makefile
 **/doc/build/**/*.*
 **/doc/build/**
+**/.ipynb_checkpoints/*.*
