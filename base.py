@@ -20,24 +20,20 @@ class BaseStacking(ABC, BaseEstimator):
         """Initialise BaseStacking with base and meta estimators."""
         self.base_estimators = base_estimators
         self.meta_estimator = meta_estimator
-        # self.named_base_estimators = self._get_named_estimators(
-        #     base_estimators)
         self.named_based_estimators = {name: estimator for name, estimator
                                        in name_estimators(base_estimators)}
-        # self.named_meta_estimator = self._get_named_estimators(
-        #     [meta_estimator], prefix='meta')
         self.named_meta_estimator = {''.join(("meta-", name)): estimator
                                      for name, estimator
                                      in name_estimators([meta_estimator])}
         self.use_orig_features = use_orig_features
 
-    def _get_named_estimators(self, estimators, prefix=None):
-        names = [type(estimator).__name__.lower() for estimator in estimators]
-        if prefix is not None:
-            names = ["-".join((prefix, name)) for name in names]
-
-        return {name: estimator
-                for name, estimator in zip(names, estimators)}
+    # def _get_named_estimators(self, estimators, prefix=None):
+    #     names = [type(estimator).__name__.lower() for estimator in estimators]
+    #     if prefix is not None:
+    #         names = ["-".join((prefix, name)) for name in names]
+    #
+    #     return {name: estimator
+    #             for name, estimator in zip(names, estimators)}
 
     @abstractmethod
     def _get_meta_features(self, X):
@@ -113,11 +109,13 @@ class StackingClassifier(BaseStacking, ClassifierMixin):
     Parameters
     ----------
     base_classifiers: array-like of shape n_classifiers
-        A list of base classifiers.
+        A list of base classifiers. They are expected to be instances of
+        `sklearn.base.BaseEstimator` and `sklearn.base.ClassifierMixin`.
 
     meta_classifier: object
         The second-level classifier to be fitted to the predictions of the
-        base classifiers.
+        base classifiers. Expected to be an instance of
+        `sklearn.base.BaseEstimator` and `sklearn.base.ClassifierMixin`.
 
     probas: boolean, optional (default True)
         If True the class probabilities as returned from `predict_proba`
@@ -179,11 +177,13 @@ class StackingRegressor(BaseStacking, RegressorMixin):
     Parameters
     ----------
     base_classifiers: array-like of shape n_classifiers
-        A list of base classifiers.
+        A list of base classifiers. They are expected to be instances of
+        `sklearn.base.BaseEstimator` and `sklearn.base.RegressorMixin`.
 
     meta_classifier: object
         The second-level classifier to be fitted to the predictions of the
-        base classifiers.
+        base classifiers. They are expected to be instances of
+        `sklearn.base.BaseEstimator` and `sklearn.base.RegressorMixin`.
 
     use_orig_features: boolean, optional (default False)
         If True the orginal features X along with prediction from the base
