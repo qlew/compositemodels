@@ -5,6 +5,7 @@ from sklearn.base import ClassifierMixin
 from sklearn.base import RegressorMixin
 from abc import ABC, abstractmethod
 import numpy as np
+from utils import name_estimators
 
 
 class BaseStacking(ABC, BaseEstimator):
@@ -19,11 +20,48 @@ class BaseStacking(ABC, BaseEstimator):
         """Abstract constructor for stacking models."""
         self.base_estimators = base_estimators
         self.meta_estimator = meta_estimator
+        # self.named_base_estimators = self._get_named_estimators(
+        #     base_estimators)
+        self.named_based_estimators = {name: estimator for name, estimator
+                                       in name_estimators(base_estimators)}
+        # self.named_meta_estimator = self._get_named_estimators(
+        #     [meta_estimator], prefix='meta')
+        self.named_meta_estimator = {''.join(("meta-", name)): estimator
+                                     for name, estimator
+                                     in name_estimators([meta_estimator])}
         self.use_orig_features = use_orig_features
+
+    def _get_named_estimators(self, estimators, prefix=None):
+        names = [type(estimator).__name__.lower() for estimator in estimators]
+        if prefix is not None:
+            names = ["-".join((prefix, name)) for name in names]
+
+        return {name: estimator
+                for name, estimator in zip(names, estimators)}
 
     @abstractmethod
     def _get_meta_features(self, X):
         """Return meta features on which the meta estimator will be trained."""
+
+    def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        Parameters
+        ----------
+        deep: boolean, optional
+            If True, will return the parameters for this estimator and
+            contained subobjects that are estimators.
+
+        Returns
+        -------
+        params: mapping of string to any
+            Parameter names mapped to their values.
+
+        """
+        if not deep:
+            return super(BaseStacking, self).get_params(deep=False)
+        else:
+            pass
 
     def fit(self, X, y):
         """Fit the meta classifier to the base classifiers.

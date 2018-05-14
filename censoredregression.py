@@ -4,6 +4,7 @@ from sklearn.base import RegressorMixin
 from sklearn.base import TransformerMixin
 from sklearn.base import is_regressor, is_classifier
 import numpy as np
+from utils import name_estimators
 
 
 class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
@@ -44,10 +45,9 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
         self._check_estimators(classifier, regressor)
         self.classifier = classifier
         self.regressor = regressor
-        self.named_estimators = self._get_named_estimators()
-        # self.named_estimators = {key: value for key, value in
-        #                          _name_estimators(
-        #                              [self.classifier, self.regressor])}
+        # self.named_estimators = self._get_named_estimators()
+        self.named_estimators = {key: value for key, value in name_estimators(
+            [self.classifier, self.regressor])}
 
         self.censored_value = censored_value
         if censored_how in ['left', 'right']:
