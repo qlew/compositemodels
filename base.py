@@ -45,7 +45,7 @@ class BaseStacking(ABC, BaseEstimator):
         Parameters
         ----------
         deep: boolean, optional
-            If True, will return the parameters for this estimator and
+            If True, return the parameters for this estimator and
             contained subobjects that are estimators.
 
         Returns
@@ -57,7 +57,21 @@ class BaseStacking(ABC, BaseEstimator):
         if not deep:
             return super(BaseStacking, self).get_params(deep=False)
         else:
-            pass
+            params = self.named_based_estimators.copy()
+            for name, estimator in self.named_based_estimators.items():
+                for key, value in estimator.get_params(deep=False).items():
+                    params[f"{name}__{key}"] = value
+
+            params.update(self.named_meta_estimator.copy())
+            for name, estimator in self.named_meta_estimator.items():
+                for key, value in estimator.get_params(deep=False).items():
+                    params[f"{name}__{key}"] = value
+
+            for key, value in super(
+                    BaseStacking, self).get_params(deep=False).items():
+                params[key] = value
+
+            return params
 
     def fit(self, X, y):
         """Fit the meta classifier to the base classifiers.
@@ -129,12 +143,12 @@ class StackingClassifier(BaseStacking, ClassifierMixin):
 
     """
 
-    def __init__(self, base_classifiers, meta_classifier,
+    def __init__(self, base_estimators, meta_estimator,
                  use_orig_features=False, probas=True):
         """Initialise StackingClassifier with base and meta classifiers."""
         super(StackingClassifier, self).__init__(
-            base_estimators=base_classifiers,
-            meta_estimator=meta_classifier,
+            base_estimators=base_estimators,
+            meta_estimator=meta_estimator,
             use_orig_features=use_orig_features)
 
         self.probas = probas
@@ -191,16 +205,16 @@ class StackingRegressor(BaseStacking, RegressorMixin):
 
     """
 
-    def __init__(self, base_regressors, meta_regressor,
+    def __init__(self, base_estimators, meta_estimator,
                  use_orig_features=False):
         """Initialise StackingRegressor with base and meta regressors."""
         super(StackingRegressor, self).__init__(
-            base_estimators=base_regressors,
-            meta_estimator=meta_regressor,
+            base_estimators=base_estimators,
+            meta_estimator=meta_estimator,
             use_orig_features=use_orig_features)
 
     def _get_meta_features(self, X):
-        y_pred = [regr.predict(X) for regr in self.base_estimators]
+        y_pred = [estimator.predict(X) for estimator in self.base_estimators]
 
         meta_features = np.column_stack(y_pred)
 
@@ -208,3 +222,19 @@ class StackingRegressor(BaseStacking, RegressorMixin):
             meta_features = np.hstack((X, meta_features))
 
         return meta_features
+
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.datasets import make_classification
+
+clfs = [RandomForestClassifier(), LogisticRegression()]
+meta = RandomForestClassifier()
+
+X, y = make_classification()
+
+stack = StackingClassifier(clfs, meta, probas=False, use_orig_features=True)
+
+stack.get_params(deep=False)
+
+stack.get_params()

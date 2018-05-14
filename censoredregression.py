@@ -68,7 +68,7 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
         Parameters
         ----------
         deep: boolean, optional
-            If True, will return the parameters for this estimator and
+            If True, return the parameters for this estimator and
             contained subobjects that are estimators.
 
         Returns
@@ -80,10 +80,15 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
         if not deep:
             return super(CensoredRegression, self).get_params(deep=False)
         else:
-            params = dict()
+            params = self.named_estimators.copy()
             for name, estimator in self.named_estimators.items():
                 for key, value in estimator.get_params(deep=False).items():
                     params[f"{name}__{key}"] = value
+
+            for key, value in super(
+                    CensoredRegression, self).get_params(deep=False).items():
+                params[key] = value
+
             return params
 
     def _get_named_estimators(self):
@@ -197,3 +202,18 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
         self.regressor.fit(X_r, y_r)
 
         return self
+
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.datasets import make_regression
+
+X, y = make_regression()
+
+regr = RandomForestRegressor()
+clf = RandomForestClassifier()
+
+cens = CensoredRegression(classifier=clf, regressor=regr)
+
+cens.get_params(deep=False)
+cens.get_params()
