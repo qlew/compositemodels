@@ -51,7 +51,6 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
         self._check_estimators(classifier, regressor)
         self.classifier = classifier
         self.regressor = regressor
-        # self.named_estimators = self._get_named_estimators()
         self.named_estimators = {key: value for key, value in name_estimators(
             [self.classifier, self.regressor])}
 
@@ -117,45 +116,21 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
         if not is_classifier(classifier):
             raise TypeError(f"{classifier} is not a classifier.")
 
-        # if not isinstance(classifier, ClassifierMixin):
-        #     raise TypeError(f"{classifier} is not a classifier.")
-        #
-        # if not isinstance(regressor, RegressorMixin):
-        #     raise TypeError(f"{regressor} is not a regressor.")
-
     def _get_regression_data(self, X, y):
-        y_reshaped = y.reshape(y.shape[0], -1)
-        data = np.hstack((X, y_reshaped))
-        if self.censored_how == 'left':
-            data_r = data[data[:, -1] > self.censored_value]
-        else:
-            data_r = data[data[:, -1] < self.censored_value]
+        y_labels = self._get_classification_labels(y)
 
-        X_r = data_r[:, :-1]
-        y_r = data_r[:, -1]
+        X_r = X[y_labels]
+        y_r = y[y_labels]
+
         return X_r, y_r
 
-    def _get_classification_labels(self, y_cont):
+    def _get_classification_labels(self, y):
         if self.censored_how == 'left':
-            y_labels = y_cont > self.censored_value
+            y_labels = y > self.censored_value
         else:
-            y_labels = y_cont < self.censored_value
+            y_labels = y < self.censored_value
 
         return y_labels
-
-    # def _fit_clf(self, X, y):
-    #     y_labels = self._get_classification_labels(y_cont=y)
-    #     self.classifier.fit(X, y_labels)
-    #
-    # def _fit_regr(self, X, y):
-    #     X_r, y_r = self._get_regression_data(X, y)
-    #     self.regressor.fit(X_r, y_r)
-
-    # def _predict(self, X):
-    #     y_pred_prob = self.classifier.predict_proba(X)
-    #     y_pred_regr = self.regressor.predict(X)
-    #
-    #     return y_pred_prob[:, 1] * y_pred_regr
 
     def predict(self, X):
         """Predict censored regression value for X.
@@ -175,7 +150,7 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
         y_pred_prob = self.classifier.predict_proba(X)
         y_pred_regr = self.regressor.predict(X)
 
-        return np.multiply(y_pred_prob, y_pred_regr)
+        return np.multiply(y_pred_prob[:, 1], y_pred_regr)
 
     def fit(self, X, y):
         """Fit the censored regression model to the given training data.
@@ -195,25 +170,10 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
             Returns self.
 
         """
-        y_labels = self._get_classification_labels(y_cont=y)
+        y_labels = self._get_classification_labels(y)
         self.classifier.fit(X, y_labels)
 
         X_r, y_r = self._get_regression_data(X, y)
         self.regressor.fit(X_r, y_r)
 
         return self
-
-
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.datasets import make_regression
-
-X, y = make_regression()
-
-regr = RandomForestRegressor()
-clf = RandomForestClassifier()
-
-cens = CensoredRegression(classifier=clf, regressor=regr)
-
-cens.get_params(deep=False)
-cens.get_params()
