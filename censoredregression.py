@@ -90,10 +90,6 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
 
             return params
 
-    def _get_named_estimators(self):
-        return {type(estimator).__name__.lower(): estimator
-                for estimator in [self.classifier, self.regressor]}
-
     def _check_estimators(self, classifier, regressor):
 
         for attribute in ['fit', 'predict_proba']:
