@@ -27,14 +27,6 @@ class BaseStacking(ABC, BaseEstimator):
                                      in name_estimators([meta_estimator])}
         self.use_orig_features = use_orig_features
 
-    # def _get_named_estimators(self, estimators, prefix=None):
-    #     names = [type(estimator).__name__.lower() for estimator in estimators]
-    #     if prefix is not None:
-    #         names = ["-".join((prefix, name)) for name in names]
-    #
-    #     return {name: estimator
-    #             for name, estimator in zip(names, estimators)}
-
     @abstractmethod
     def _get_meta_features(self, X):
         """Return meta features on which the meta estimator will be trained."""
@@ -222,19 +214,3 @@ class StackingRegressor(BaseStacking, RegressorMixin):
             meta_features = np.hstack((X, meta_features))
 
         return meta_features
-
-
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.datasets import make_classification
-
-clfs = [RandomForestClassifier(), LogisticRegression()]
-meta = RandomForestClassifier()
-
-X, y = make_classification()
-
-stack = StackingClassifier(clfs, meta, probas=False, use_orig_features=True)
-
-stack.get_params(deep=False)
-
-stack.get_params()
