@@ -97,6 +97,28 @@ class StackingClassifierCV(BaseStacking, ClassifierMixin):
             Predicted class labels.
 
         """
+        meta_features = self._get_meta_features(X)
+        return self.meta_estimator.predict(meta_features)
+
+    def predict_proba(self, X):
+        """Predict class probabilities for X.
+
+        Parameters
+        ----------
+        X: {array-like, sparse matrix}, shape(n_samples, n_features)
+            Training vectors, where n_samples is the number samples and
+            n_features is the number of features.
+
+        Returns
+        -------
+        y: array of shape n_samples
+            Predicted class probabilities.
+
+        """
+        meta_features = self._get_meta_features(X)
+        return self.meta_estimator.predict_proba(meta_features)
+
+    def _get_meta_features(self, X):
         if self.probas:
             y_pred = [clf.predict_proba(X) for clf in self.base_estimators]
         else:
@@ -107,7 +129,4 @@ class StackingClassifierCV(BaseStacking, ClassifierMixin):
         if self.use_orig_features:
             meta_features = np.hstack((X, meta_features))
 
-        return self.meta_estimator.predict(meta_features)
-
-    def _get_meta_features(self, X):
-        pass
+        return meta_features
