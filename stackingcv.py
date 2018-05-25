@@ -25,7 +25,7 @@ class StackingClassifierCV(BaseStacking, ClassifierMixin):
             meta_estimator=meta_estimator,
             use_orig_features=use_orig_features)
 
-        self.cv = check_cv(cv)
+        self.cv = cv
         self.probas = probas
 
     def fit(self, X, y):
@@ -47,6 +47,7 @@ class StackingClassifierCV(BaseStacking, ClassifierMixin):
 
         """
         meta_features_list = []
+        cv = check_cv(self.cv, y=y, classifier=True)
 
         for clf in self.base_estimators:
 
@@ -54,13 +55,13 @@ class StackingClassifierCV(BaseStacking, ClassifierMixin):
                 meta_features = np.zeros((y.shape[0], 2))
 
                 pred = [(test, clf.fit(X[train], y[train]).predict_proba(
-                    X[test])) for train, test in self.cv.split(X, y)]
+                    X[test])) for train, test in cv.split(X, y)]
 
             else:
                 meta_features = np.zeros((y.shape[0],))
 
                 pred = [(test, clf.fit(X[train], y[train]).predict(
-                    X[test])) for train, test in self.cv.split(X, y)]
+                    X[test])) for train, test in cv.split(X, y)]
 
             for index, y_pred in pred:
                 meta_features[index] = y_pred
