@@ -88,7 +88,9 @@ class BaseStacking(ABC, BaseEstimator):
 
         X_meta = self._get_meta_features(X)
 
-        return self.meta_estimator.fit(X_meta, y)
+        self.meta_estimator.fit(X_meta, y)
+
+        return self
 
     def predict(self, X):
         """Predict labels for X.
