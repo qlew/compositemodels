@@ -78,7 +78,10 @@ class BaseStacking(ABC, BaseEstimator):
             return params
 
     def fit(self, X, y):
-        """Fit the meta classifier to the base classifiers.
+        """Fit the stacking estimator to the training data.
+
+        First fit the base estimators to the training data, then fit the meta
+        estimator to the predictions of the base estimators and the targets.
 
         Parameters
         ----------
@@ -86,8 +89,9 @@ class BaseStacking(ABC, BaseEstimator):
             Training vectors, where n_samples is the number samples and
             n_features is the number of features.
 
-        y: array-like, shape(n_samples,)
-            Labels for classification.
+        y: array-like, shape(n_samples, [n_classes])
+            Targets for the estimation. Continuous in case of regression,
+            binary or multi-class in case of classification.
 
         Returns
         -------
@@ -105,7 +109,7 @@ class BaseStacking(ABC, BaseEstimator):
         return self
 
     def predict(self, X):
-        """Predict labels for X.
+        """Predict targets for X.
 
         Parameters
         ----------
@@ -116,7 +120,7 @@ class BaseStacking(ABC, BaseEstimator):
         Returns
         -------
         y: array of shape n_samples
-            Predicted class labels.
+            Predicted targets.
 
         """
         X_meta = self._get_meta_features(X)
