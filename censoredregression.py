@@ -1,10 +1,11 @@
 """Regression model for censored data."""
+
 from sklearn.base import BaseEstimator
 from sklearn.base import RegressorMixin
 from sklearn.base import TransformerMixin
 from sklearn.base import is_regressor, is_classifier
 import numpy as np
-from utils import name_estimators
+from base import name_estimators
 
 
 class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
@@ -112,13 +113,13 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
         if not is_classifier(classifier):
             raise TypeError(f"{classifier} is not a classifier.")
 
-    def _get_regression_data(self, X, y):
-        y_labels = self._get_classification_labels(y)
-
-        X_r = X[y_labels]
-        y_r = y[y_labels]
-
-        return X_r, y_r
+    # def _get_regression_data(self, X, y):
+    #     y_labels = self._get_classification_labels(y)
+    #
+    #     X_r = X[y_labels]
+    #     y_r = y[y_labels]
+    #
+    #     return X_r, y_r
 
     def _get_classification_labels(self, y):
         if self.censored_how == 'left':
@@ -169,7 +170,7 @@ class CensoredRegression(BaseEstimator, RegressorMixin, TransformerMixin):
         y_labels = self._get_classification_labels(y)
         self.classifier.fit(X, y_labels)
 
-        X_r, y_r = self._get_regression_data(X, y)
+        X_r, y_r = X[y_labels], y[y_labels]
         self.regressor.fit(X_r, y_r)
 
         return self
